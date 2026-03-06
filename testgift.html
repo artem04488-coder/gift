@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>С Праздником, Мама!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #fce4ec 0%, #f8bbd0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 20px rgba(233, 30, 99, 0.2);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff99bb;
+        }
+
+        .top-text {
+            font-size: 1.1rem;
+            color: #880e4f;
+            font-weight: 600;
+        }
+
+        .counter {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #c2185b;
+            background: #ffe4ec;
+            padding: 8px 18px;
+            border-radius: 40px;
+            box-shadow: 0 4px 10px rgba(233, 30, 99, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .counter.pulse {
+            transform: scale(1.1);
+            background: #ff99bb;
+            color: white;
+        }
+
+        /* Игровое поле */
+        .game-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Падающие сердечки */
+        .heart-fall {
+            position: absolute;
+            font-size: 3rem;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10;
+            filter: drop-shadow(0 5px 15px rgba(233, 30, 99, 0.4));
+            -webkit-tap-highlight-color: transparent;
+            top: -60px;
+            transition: transform 0.2s ease;
+            animation: fall linear forwards;
+            will-change: transform;
+        }
+
+        @keyframes fall {
+            0% { 
+                transform: translateY(0) rotate(0deg) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg) scale(0.8); 
+                opacity: 0.6; 
+            }
+        }
+
+        .heart-fall:active {
+            transform: scale(1.3);
+        }
+
+        .heart-fall.caught {
+            animation: catch 0.3s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes catch {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* Экран поздравления */
+        .congrats-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffd9e8, #ffb6d1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .congrats-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Анимированный контент */
+        .congrats-content {
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .congrats-screen.show .congrats-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .big-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #880e4f;
+            line-height: 1.2;
+            margin-bottom: 5px;
+            animation: titleGlow 2s infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 10px #ff99bb; }
+            50% { text-shadow: 0 0 20px #ff4081; }
+        }
+
+        .big-subtitle {
+            font-size: 3rem;
+            color: #ad1457;
+            margin-bottom: 30px;
+            animation: subtitleFloat 3s infinite;
+        }
+
+        @keyframes subtitleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .message-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 30px 25px;
+            margin: 20px 0;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(233, 30, 99, 0.2);
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #4a4a4a;
+            border-left: 8px solid #ff4081;
+            text-align: left;
+            animation: messageSlide 1s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .signature {
+            text-align: right;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #880e4f;
+            font-weight: bold;
+            animation: signatureFade 1.5s ease-out;
+        }
+
+        @keyframes signatureFade {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .flowers-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 2.5rem;
+            margin: 30px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .flowers-row span {
+            animation: flowerBounce 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes flowerBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .flowers-row span:nth-child(2) { animation-delay: 0.2s; }
+        .flowers-row span:nth-child(3) { animation-delay: 0.4s; }
+        .flowers-row span:nth-child(4) { animation-delay: 0.6s; }
+        .flowers-row span:nth-child(5) { animation-delay: 0.8s; }
+        .flowers-row span:nth-child(6) { animation-delay: 1s; }
+
+        /* Фоновые цветы */
+        .bg-flower {
+            position: fixed;
+            font-size: 4rem;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 0;
+            animation: bgFloat 20s infinite linear;
+        }
+
+        @keyframes bgFloat {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Фоновые цветы -->
+    <div class="bg-flower" style="top: 10%; left: 5%;">🌸</div>
+    <div class="bg-flower" style="top: 20%; right: 5%;">🌺</div>
+    <div class="bg-flower" style="bottom: 10%; left: 10%;">🌷</div>
+    <div class="bg-flower" style="bottom: 20%; right: 10%;">🌹</div>
+
+    <!-- Верхняя панель -->
+    <div class="top-bar">
+        <span class="top-text">Поймай 8 сердечек 💝 для Мама</span>
+        <span class="counter" id="counter">0/8</span>
+    </div>
+
+    <!-- Игровое поле -->
+    <div class="game-container" id="gameContainer"></div>
+
+    <!-- Экран поздравления -->
+    <div class="congrats-screen" id="congratsScreen">
+        <div class="congrats-content">
+            <div class="big-title">С Праздником,</div>
+            <div class="big-subtitle">Мама!</div>
+            
+            <div class="message-box">
+                С праздником весны! Желаю тебе счастья, здоровья и только ярких дней. Ты — самая лучшая! 🌸
+                <div class="signature">— Артём</div>
+            </div>
+
+            <div class="flowers-row">
+                <span>🌹</span>
+                <span>💕</span>
+                <span>🌸</span>
+                <span>✨</span>
+                <span>🎀</span>
+                <span>💐</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let caught = 0;
+        const total = 8;
+        const gameContainer = document.getElementById('gameContainer');
+        const counter = document.getElementById('counter');
+        const congratsScreen = document.getElementById('congratsScreen');
+        
+        // Анимация счётчика
+        function pulseCounter() {
+            counter.classList.add('pulse');
+            setTimeout(() => counter.classList.remove('pulse'), 300);
+        }
+        
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart-fall';
+            heart.innerHTML = '❤️';
+            
+            // Случайное положение
+            heart.style.left = Math.random() * 80 + 10 + '%';
+            
+            // Случайный размер
+            const size = Math.random() * 1.5 + 2.5;
+            heart.style.fontSize = size + 'rem';
+            
+            // Случайная скорость падения
+            const duration = Math.random() * 4 + 4; // 4-8 секунд
+            heart.style.animationDuration = duration + 's';
+            
+            heart.onclick = function(e) {
+                e.stopPropagation();
+                if (!this.classList.contains('caught')) {
+                    this.classList.add('caught');
+                    pulseCounter();
+                    
+                    // Увеличиваем счётчик
+                    caught++;
+                    counter.textContent = caught + '/' + total;
+                    
+                    // Проверка победы
+                    if (caught >= total) {
+                        setTimeout(() => {
+                            congratsScreen.classList.add('show');
+                        }, 300);
+                    }
+                    
+                    // Удаляем после анимации
+                    setTimeout(() => {
+                        if (this.parentNode) {
+                            this.remove();
+                        }
+                    }, 300);
+                }
+            };
+            
+            gameContainer.appendChild(heart);
+            
+            // Автоматическое удаление если не поймали
+            setTimeout(() => {
+                if (heart.parentNode && !heart.classList.contains('caught')) {
+                    heart.remove();
+                }
+            }, duration * 1000);
+        }
+
+        // Запускаем падение (для Telegram важно использовать setInterval)
+        setInterval(createHeart, 800);
+        
+        // Сразу создаём несколько
+        for(let i = 0; i < 4; i++) {
+            setTimeout(createHeart, i * 200);
+        }
+
+        // Для Telegram: предотвращаем масштабирование
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.classList.contains('game-container')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
